@@ -1,6 +1,6 @@
 <template>
   <div class="game">
-        <div class="game__message"></div>
+        <div class="game__message"> {{ message }} </div>
 
         <div class="game__field">
             <div class="game__cell" 
@@ -8,7 +8,7 @@
             :key="cell.index"
             @click="onCellClick(index)">
                 <!-- <img :src="cell.imageUrl"> -->
-                <span class="game__cell-inner">{{cell.inner}}</span>
+                <span class="game__cell-inner">{{ cell.inner }}</span>
             </div>
         </div>
 
@@ -21,7 +21,6 @@ export default {
     data() {
         return {
             step: false,
-            isShow: false,
             // players: [
             //     {
             //         name: 'cross',
@@ -55,26 +54,43 @@ export default {
                 [3, 5, 7]
             ],
             data: [],
-            messages: []
+            messages: {
+                alert: 'Cell is not free!',
+                crossWon: 'Crosses won!',
+                zeroWon: 'Zeroes won!'
+            },
+            message: null
         }
     },
     methods: {
         onCellClick(index) {
             let cell = this.cells[index];
+
             if (cell.inner == null) {
-                cell.inner = this.player
+                cell.inner = this.player;
             } else {
-                this.isShow = true 
+                this.message = this.messages.alert;
+                return
             }
 
-            this.isShow = false
+            for (let i in this.cells) {
+                if (this.cells[i].inner == this.player) {
+                    this.data.push(this.cells[i].index)
+                }
+            }
+
+            this.player = this.player == 'x' ? '0' : 'x';
+
+            this.message = null;
         },
         loadNewGame() {
 
         },
 
-        getWinner() {
+        getWinner(data) {
+            for (let i in this.winningIndex) {
 
+            }
         }
     },
 }
