@@ -1,26 +1,82 @@
 <template>
   <div class="game">
-      <div class="game__result"></div>
+        <div class="game__message"></div>
 
-      <div class="game__field">
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-        <div class="game__element"></div>
-      </div>
+        <div class="game__field">
+            <div class="game__cell" 
+            v-for="(cell, index) of cells"
+            :key="cell.index"
+            @click="onCellClick(index)">
+                <!-- <img :src="cell.imageUrl"> -->
+                <span class="game__cell-inner">{{cell.inner}}</span>
+            </div>
+        </div>
 
-      <button class="game__btn">New game</button>
+        <button class="game__btn" @click="loadNewGame()">New game</button>
   </div>
 </template>
 
 <script>
 export default {
+    data() {
+        return {
+            step: false,
+            isShow: false,
+            // players: [
+            //     {
+            //         name: 'cross',
+            //         playerImage: './assets/cross.svg'
+            //     },
+            //     {
+            //         name: 'zero',
+            //         playerImage: './assets/zero.svg'
+            //     }
+            // ],
+            player: 'x',
+            cells: [
+                {index: 1, inner: null},
+                {index: 2, inner: null},
+                {index: 3, inner: null},
+                {index: 4, inner: null},
+                {index: 5, inner: null},
+                {index: 6, inner: null},
+                {index: 7, inner: null},
+                {index: 8, inner: null},
+                {index: 9, inner: null},
+            ],
+            winningIndex: [
+                [1, 2 ,3],
+                [4, 5, 6],
+                [7, 8, 9],
+                [1, 4, 7],
+                [2, 5, 8],
+                [3, 6, 9],
+                [1, 5, 9],
+                [3, 5, 7]
+            ],
+            data: [],
+            messages: []
+        }
+    },
+    methods: {
+        onCellClick(index) {
+            let cell = this.cells[index];
+            if (cell.inner == null) {
+                cell.inner = this.player
+            } else {
+                this.isShow = true 
+            }
 
+            this.isShow = false
+        },
+        loadNewGame() {
+
+        },
+
+        getWinner() {
+
+        }
+    },
 }
 </script>
 
@@ -34,8 +90,8 @@ export default {
         justify-content: center;
         flex-direction: column;
 
-        &__result{
-            color: green;
+        &__message{
+            color: #9c2222;
             font-size: 35px;
             font-weight: bolder;
             margin-top: 20px;
@@ -51,11 +107,18 @@ export default {
             margin: 80px 0 50px 0;
         }
 
-        &__element{
+        &__cell{
             width: 120px;
             height: 120px;
             border: 2px solid black;
             cursor: pointer;
+            text-align: center;
+            &:hover{
+                background: #F1F1F1;
+            }
+            &-inner{
+                font-size: 100px;
+            }
         }
 
         &__btn{
@@ -66,7 +129,7 @@ export default {
         }
     }
 
-    .active{
-        background: rgba(0, 0, 0, 0.3);
-    }
+    // .active{
+    //     background: rgba(0, 0, 0, 0.3);
+    // }
 </style>
