@@ -43,7 +43,6 @@ export default {
                 [1, 5, 9],
                 [3, 5, 7]
             ],
-            data: [],
             messages: {
                 alert: 'Cell is not free!',
                 crossWon: 'Crosses won!',
@@ -76,7 +75,14 @@ export default {
         },
 
         loadNewGame() {
+            //Обнуляем все значения
+            this.message = null;
+            this.count = 0;
 
+            this.cells.forEach( (currentCell) =>{
+                currentCell.inner = null;
+                currentCell.isWinClass = null;
+            })
         },
 
         getWinner() {
@@ -89,6 +95,7 @@ export default {
                     this.cells[(i[0] - 1)].isWinClass = 'is-win'
                     this.cells[(i[1] - 1)].isWinClass = 'is-win'
                     this.cells[(i[2] - 1)].isWinClass = 'is-win'
+
                 }
 
                 else if (this.cells[(i[0] - 1)].inner == '0' &&
