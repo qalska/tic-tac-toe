@@ -3,11 +3,11 @@
         <div class="game__message"> {{ message }} </div>
 
         <div class="game__field">
-            <div class="game__cell" 
+            <div class="game__cell"
+            :class="cell.isWinClass"
             v-for="(cell, index) of cells"
             :key="cell.index"
             @click="onCellClick(index)">
-                <!-- <img :src="cell.imageUrl"> -->
                 <span class="game__cell-inner">{{ cell.inner }}</span>
             </div>
         </div>
@@ -20,28 +20,18 @@
 export default {
     data() {
         return {
-            step: false,
-            // players: [
-            //     {
-            //         name: 'cross',
-            //         playerImage: './assets/cross.svg'
-            //     },
-            //     {
-            //         name: 'zero',
-            //         playerImage: './assets/zero.svg'
-            //     }
-            // ],
             player: 'x',
+            count: 0,
             cells: [
-                {index: 1, inner: null},
-                {index: 2, inner: null},
-                {index: 3, inner: null},
-                {index: 4, inner: null},
-                {index: 5, inner: null},
-                {index: 6, inner: null},
-                {index: 7, inner: null},
-                {index: 8, inner: null},
-                {index: 9, inner: null},
+                {index: 1, inner: null, isWinClass: null},
+                {index: 2, inner: null, isWinClass: null},
+                {index: 3, inner: null, isWinClass: null},
+                {index: 4, inner: null, isWinClass: null},
+                {index: 5, inner: null, isWinClass: null},
+                {index: 6, inner: null, isWinClass: null},
+                {index: 7, inner: null, isWinClass: null},
+                {index: 8, inner: null, isWinClass: null},
+                {index: 9, inner: null, isWinClass: null},
             ],
             winningIndex: [
                 [1, 2 ,3],
@@ -57,7 +47,8 @@ export default {
             messages: {
                 alert: 'Cell is not free!',
                 crossWon: 'Crosses won!',
-                zeroWon: 'Zeroes won!'
+                zeroWon: 'Zeroes won!',
+                draw: 'Draw!'
             },
             message: null
         }
@@ -66,6 +57,7 @@ export default {
         onCellClick(index) {
             let cell = this.cells[index];
 
+            // Заполняем клетки ходами X или 0, предупреждаем о двойном нажатии на занятую клетку
             if (cell.inner == null) {
                 cell.inner = this.player;
             } else {
@@ -73,24 +65,46 @@ export default {
                 return
             }
 
-            for (let i in this.cells) {
-                if (this.cells[i].inner == this.player) {
-                    this.data.push(this.cells[i].index)
-                }
-            }
-
             this.player = this.player == 'x' ? '0' : 'x';
 
+            // Считаем ходы и убираем предупреждение
+            this.count++
+
             this.message = null;
+
+            this.getWinner()
         },
+
         loadNewGame() {
 
         },
 
-        getWinner(data) {
-            for (let i in this.winningIndex) {
+        getWinner() {
+            // Проходимся по массиву выигрышных индексов и проверяем на совпадения
+            this.winningIndex.forEach( (i) => {
+                if (this.cells[(i[0] - 1)].inner == 'x' &&
+                this.cells[(i[1] - 1)].inner == 'x' &&
+                this.cells[(i[2] - 1)].inner == 'x') {
+                    this.message = this.messages.crossWon;
+                    this.cells[(i[0] - 1)].isWinClass = 'is-win'
+                    this.cells[(i[1] - 1)].isWinClass = 'is-win'
+                    this.cells[(i[2] - 1)].isWinClass = 'is-win'
+                }
 
-            }
+                else if (this.cells[(i[0] - 1)].inner == '0' &&
+                this.cells[(i[1] - 1)].inner == '0' &&
+                this.cells[(i[2] - 1)].inner == '0') {
+                    this.message = this.messages.zeroWon;
+                    this.cells[(i[0] - 1)].isWinClass = 'is-win'
+                    this.cells[(i[1] - 1)].isWinClass = 'is-win'
+                    this.cells[(i[2] - 1)].isWinClass = 'is-win'
+                }
+
+                // Ничья, если все клетки заняты
+                else if (this.count == 9) {
+                    this.message = this.messages.draw;
+                }
+            })           
         }
     },
 }
@@ -107,7 +121,7 @@ export default {
         flex-direction: column;
 
         &__message{
-            color: #9c2222;
+            color: #be1d1d;
             font-size: 35px;
             font-weight: bolder;
             margin-top: 20px;
@@ -145,7 +159,10 @@ export default {
         }
     }
 
-    // .active{
-    //     background: rgba(0, 0, 0, 0.3);
-    // }
+    .is-win{
+        background-color: rgba(53, 170, 29, 0.75);
+        &:hover{
+            background-color: rgba(53, 170, 29, 0.75);
+        }
+    }
 </style>
