@@ -22,6 +22,7 @@ export default {
         return {
             player: 'x',
             count: 0,
+            inProgress: true,
             cells: [
                 {index: 1, inner: null, isWinClass: null},
                 {index: 2, inner: null, isWinClass: null},
@@ -57,27 +58,28 @@ export default {
             let cell = this.cells[index];
 
             // Заполняем клетки ходами X или 0, предупреждаем о двойном нажатии на занятую клетку
-            if (cell.inner == null) {
+            if (this.inProgress && cell.inner == null) {
                 cell.inner = this.player;
+                this.player = this.player == 'x' ? '0' : 'x';
+            } 
+            else if (cell.inner == null) {
+                this.message = this.message;
             } else {
                 this.message = this.messages.alert;
                 return
             }
 
-            this.player = this.player == 'x' ? '0' : 'x';
-
-            // Считаем ходы и убираем предупреждение
+            // Считаем ходы
             this.count++
 
-            this.message = null;
+            this.getWinner();
 
-            this.getWinner()
         },
 
         loadNewGame() {
             //Обнуляем все значения
             this.message = null;
-            this.count = 0;
+            this.inProgress = true;
 
             this.cells.forEach( (currentCell) =>{
                 currentCell.inner = null;
@@ -92,24 +94,29 @@ export default {
                 this.cells[(i[1] - 1)].inner == 'x' &&
                 this.cells[(i[2] - 1)].inner == 'x') {
                     this.message = this.messages.crossWon;
-                    this.cells[(i[0] - 1)].isWinClass = 'is-win'
-                    this.cells[(i[1] - 1)].isWinClass = 'is-win'
-                    this.cells[(i[2] - 1)].isWinClass = 'is-win'
-
+                    this.cells[(i[0] - 1)].isWinClass = 'is-win';
+                    this.cells[(i[1] - 1)].isWinClass = 'is-win';
+                    this.cells[(i[2] - 1)].isWinClass = 'is-win';
+                    this.inProgress = false;
+                    this.count = 0;
                 }
 
                 else if (this.cells[(i[0] - 1)].inner == '0' &&
                 this.cells[(i[1] - 1)].inner == '0' &&
                 this.cells[(i[2] - 1)].inner == '0') {
                     this.message = this.messages.zeroWon;
-                    this.cells[(i[0] - 1)].isWinClass = 'is-win'
-                    this.cells[(i[1] - 1)].isWinClass = 'is-win'
-                    this.cells[(i[2] - 1)].isWinClass = 'is-win'
+                    this.cells[(i[0] - 1)].isWinClass = 'is-win';
+                    this.cells[(i[1] - 1)].isWinClass = 'is-win';
+                    this.cells[(i[2] - 1)].isWinClass = 'is-win';
+                    this.inProgress = false;
+                    this.count = 0;
                 }
 
                 // Ничья, если все клетки заняты
                 else if (this.count == 9) {
                     this.message = this.messages.draw;
+                    this.inProgress = false;
+                    this.count = 0;
                 }
             })           
         }
