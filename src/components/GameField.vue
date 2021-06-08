@@ -20,19 +20,19 @@
 export default {
     data() {
         return {
-            player: 'x',
+            player: 'X',
             count: 0,
             inProgress: true,
             cells: [
-                {index: 1, inner: null, isWinClass: null},
-                {index: 2, inner: null, isWinClass: null},
-                {index: 3, inner: null, isWinClass: null},
-                {index: 4, inner: null, isWinClass: null},
-                {index: 5, inner: null, isWinClass: null},
-                {index: 6, inner: null, isWinClass: null},
-                {index: 7, inner: null, isWinClass: null},
-                {index: 8, inner: null, isWinClass: null},
-                {index: 9, inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
+                {inner: null, isWinClass: null},
             ],
             winningIndex: [
                 [1, 2 ,3],
@@ -46,8 +46,8 @@ export default {
             ],
             messages: {
                 alert: 'Cell is not free!',
-                crossWon: 'Crosses won!',
-                zeroWon: 'Zeroes won!',
+                'X': 'Crosses won!',
+                'O': 'Zeroes won!',
                 draw: 'Draw!'
             },
             message: null
@@ -58,14 +58,15 @@ export default {
             let cell = this.cells[index];
 
             // Заполняем клетки ходами X или 0, предупреждаем о двойном нажатии на занятую клетку
-            if (this.inProgress && cell.inner == null) {
+            if (this.inProgress && cell.inner === null) {
                 cell.inner = this.player;
-                this.player = this.player == 'x' ? '0' : 'x';
+                this.player = this.player == 'X' ? 'O' : 'X';
+                this.setMessage(null)
             } 
-            else if (cell.inner == null) {
-                this.message = this.message;
+            else if (cell.inner === null) {
+                this.setMessage(this.messages);
             } else {
-                this.message = this.messages.alert;
+                this.setMessage(this.messages.alert);
                 return
             }
 
@@ -73,52 +74,53 @@ export default {
             this.count++
 
             this.getWinner();
-
         },
 
+        getWinner() {
+            this.winningIndex.forEach( (i) => {
+                const [idx1, idx2, idx3] = i;
+                const cellIdx1 = this.cells[(idx1 - 1)],
+                      cellIdx2 = this.cells[(idx2 - 1)],
+                      cellIdx3 = this.cells[(idx3 - 1)];
+
+                if (cellIdx1.inner &&
+                    cellIdx1.inner === cellIdx2.inner &&
+                    cellIdx1.inner === cellIdx3.inner) {
+                    cellIdx1.isWinClass = cellIdx2.isWinClass = cellIdx3.isWinClass = 'is-win';
+                    this.setMessage(this.messages[cellIdx1.inner]);
+                    this.dropProgress();
+                    this.dropCount();
+                }
+
+                // Ничья, если все клетки заняты
+                else if (this.count === 9) {
+                    this.setMessage(this.messages.draw);
+                    this.dropProgress();
+                    this.dropCount();
+                }
+            })           
+        },
         loadNewGame() {
             //Обнуляем все значения
-            this.message = null;
+            this.setMessage(null);
             this.inProgress = true;
 
-            this.cells.forEach( (currentCell) =>{
+            this.cells.forEach( (currentCell) => {
                 currentCell.inner = null;
                 currentCell.isWinClass = null;
             })
         },
 
-        getWinner() {
-            // Проходимся по массиву выигрышных индексов и проверяем на совпадения
-            this.winningIndex.forEach( (i) => {
-                if (this.cells[(i[0] - 1)].inner == 'x' &&
-                this.cells[(i[1] - 1)].inner == 'x' &&
-                this.cells[(i[2] - 1)].inner == 'x') {
-                    this.message = this.messages.crossWon;
-                    this.cells[(i[0] - 1)].isWinClass = 'is-win';
-                    this.cells[(i[1] - 1)].isWinClass = 'is-win';
-                    this.cells[(i[2] - 1)].isWinClass = 'is-win';
-                    this.inProgress = false;
-                    this.count = 0;
-                }
+        setMessage(message) {
+            this.message = message;
+        },
 
-                else if (this.cells[(i[0] - 1)].inner == '0' &&
-                this.cells[(i[1] - 1)].inner == '0' &&
-                this.cells[(i[2] - 1)].inner == '0') {
-                    this.message = this.messages.zeroWon;
-                    this.cells[(i[0] - 1)].isWinClass = 'is-win';
-                    this.cells[(i[1] - 1)].isWinClass = 'is-win';
-                    this.cells[(i[2] - 1)].isWinClass = 'is-win';
-                    this.inProgress = false;
-                    this.count = 0;
-                }
+        dropProgress() {
+            this.inProgress = false;
+        },
 
-                // Ничья, если все клетки заняты
-                else if (this.count == 9) {
-                    this.message = this.messages.draw;
-                    this.inProgress = false;
-                    this.count = 0;
-                }
-            })           
+        dropCount() {
+            this.count = 0;
         }
     },
 }
