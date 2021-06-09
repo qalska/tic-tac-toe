@@ -4,6 +4,7 @@
 
         <div class="game__field">
             <div class="game__cell"
+            :class="{'is-win': cell.isWinClass == true}"
             v-for="(cell, index) of cells"
             :key="cell.index"
             @click="onCellClick(index)">
@@ -22,17 +23,16 @@ export default {
             player: 'X',
             count: 0,
             inProgress: true,
-            isActive: false,
             cells: [
-                {inner: null},
-                {inner: null},
-                {inner: null},
-                {inner: null},
-                {inner: null},
-                {inner: null},
-                {inner: null},
-                {inner: null},
-                {inner: null},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
+                {inner: null, isWinClass: false},
             ],
             winningIndex: [
                 [1, 2 ,3],
@@ -44,7 +44,6 @@ export default {
                 [1, 5, 9],
                 [3, 5, 7]
             ],
-            winningCombination: null,
             messages: {
                 alert: 'Cell is not free!',
                 'X': 'Crosses won!',
@@ -83,17 +82,15 @@ export default {
                 const isWin = item.map(item => this.cells[item - 1].inner === this.player).every(elem => elem)
 
                 if (isWin) {
-                    this.winningCombination = item;
+                    item.map(idx => this.cells[idx - 1].isWinClass = true)
                     this.setMessage(this.messages[this.player]);
                     this.dropProgress();
-                    this.dropCount();
                 }
 
                 // Ничья, если все клетки заняты
                 else if (this.count === 9) {
                     this.setMessage(this.messages.draw);
                     this.dropProgress();
-                    this.dropCount();
                 }
             })           
         },
@@ -114,11 +111,8 @@ export default {
 
         dropProgress() {
             this.inProgress = false;
-        },
-
-        dropCount() {
             this.count = 0;
-        }
+        },
     },
 }
 </script>
