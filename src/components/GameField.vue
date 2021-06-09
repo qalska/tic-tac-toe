@@ -4,7 +4,6 @@
 
         <div class="game__field">
             <div class="game__cell"
-            :class="cell.isWinClass"
             v-for="(cell, index) of cells"
             :key="cell.index"
             @click="onCellClick(index)">
@@ -23,16 +22,17 @@ export default {
             player: 'X',
             count: 0,
             inProgress: true,
+            isActive: false,
             cells: [
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
-                {inner: null, isWinClass: null},
+                {inner: null},
+                {inner: null},
+                {inner: null},
+                {inner: null},
+                {inner: null},
+                {inner: null},
+                {inner: null},
+                {inner: null},
+                {inner: null},
             ],
             winningIndex: [
                 [1, 2 ,3],
@@ -44,6 +44,7 @@ export default {
                 [1, 5, 9],
                 [3, 5, 7]
             ],
+            winningCombination: null,
             messages: {
                 alert: 'Cell is not free!',
                 'X': 'Crosses won!',
@@ -60,7 +61,6 @@ export default {
             // Заполняем клетки ходами X или 0, предупреждаем о двойном нажатии на занятую клетку
             if (this.inProgress && cell.inner === null) {
                 cell.inner = this.player;
-                this.player = this.player == 'X' ? 'O' : 'X';
                 this.setMessage(null)
             } 
             else if (cell.inner === null) {
@@ -74,20 +74,17 @@ export default {
             this.count++
 
             this.getWinner();
+
+            this.player = this.player == 'X' ? 'O' : 'X';
         },
 
         getWinner() {
-            this.winningIndex.forEach( (i) => {
-                const [idx1, idx2, idx3] = i;
-                const cellIdx1 = this.cells[(idx1 - 1)],
-                      cellIdx2 = this.cells[(idx2 - 1)],
-                      cellIdx3 = this.cells[(idx3 - 1)];
+            this.winningIndex.forEach( (item) => {
+                const isWin = item.map(item => this.cells[item - 1].inner === this.player).every(elem => elem)
 
-                if (cellIdx1.inner &&
-                    cellIdx1.inner === cellIdx2.inner &&
-                    cellIdx1.inner === cellIdx3.inner) {
-                    cellIdx1.isWinClass = cellIdx2.isWinClass = cellIdx3.isWinClass = 'is-win';
-                    this.setMessage(this.messages[cellIdx1.inner]);
+                if (isWin) {
+                    this.winningCombination = item;
+                    this.setMessage(this.messages[this.player]);
                     this.dropProgress();
                     this.dropCount();
                 }
